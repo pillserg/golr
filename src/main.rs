@@ -4,6 +4,9 @@ use std::collections::HashMap;
 use std::thread::sleep_ms;
 
 
+type Point = (u8, u8);
+
+
 #[derive(Debug, PartialEq, Clone)]
 enum CellState{
     Alive,
@@ -11,30 +14,30 @@ enum CellState{
 }
 
 
-type WSize = i8;
-type Point = (WSize, WSize);
-
-
 impl Rand for CellState {
     #[inline]
     fn rand<R:Rng>(rng: &mut R) -> CellState {
-        let x: bool = rand::random();
-        match x {
+        match rand::random() {
             true => CellState::Alive,
             false => CellState::Dead
         }
     }
 }
+
+trait Measurable {
+
+}
+
 #[derive(Debug, Clone)]
 struct World {
-    width: WSize,
-    height: WSize,
+    width: u8,
+    height: u8,
     cells: HashMap<Point, CellState>
 }
 
 
 impl World {
-    fn new(width: WSize, height: WSize)  -> World {
+    fn new(width: u8, height: u8)  -> World {
         let mut world = World{width: width, height: height, cells: HashMap::new()};
         for y in 0..height { for x in 0..width {
             world.cells.insert((x, y), CellState::Dead);
@@ -50,16 +53,16 @@ impl World {
         
     }
 
-    fn decide_fate(&self, x: WSize, y: WSize) -> CellState {
+    fn decide_fate(&self, x: u8, y: u8) -> CellState {
         rand::random()
     }
 
-    fn is_alive(&self, x: WSize, y: WSize) -> bool {
+    fn is_alive(&self, x: u8, y: u8) -> bool {
         let key = (x, y);
         self.cells.get(&key) == Some(&CellState::Alive)
     }
 
-    fn set_state(&mut self, x: WSize, y: WSize, value: CellState) {
+    fn set_state(&mut self, x: u8, y: u8, value: CellState) {
         self.cells.insert((x, y), value);
     }
 
@@ -71,26 +74,48 @@ impl World {
     }
 }
 
-
-fn clear_screen() {
-    print!("\x1b[2J\n");
-}
-
-fn draw(ref world: &World) {
-    clear_screen();
-    for y in 0..world.height {
-        print!("\n");
-        for x in 0..world.width {
-            if world.is_alive(x,y) {
-                print!("□");
-            } else {
-                print!(" ");
-            }
-                
-        }
+impl display::Drawable for World {
+    fn should_draw(&self, x: u8, y: u8) -> bool {
+        self.is_alive(x, y)
     }
-    print!("\n");
+    fn get_height(&self) -> u8 {
+        self.height
+    }
+    fn get_width(&self) -> u8 {
+        self.width
+    }
 }
+
+
+mod display {
+    fn clear_screen() {
+        print!("\x1b[2J\n");
+    }
+
+    pub trait Drawable {
+        fn should_draw(&self, x: u8, y: u8) -> bool;
+        fn get_height(&self) -> u8;
+        fn get_width(&self) -> u8;
+    }
+
+    pub fn draw<T: Drawable>(ref world: &T) {
+        clear_screen();
+        for y in 0..world.get_height() {
+            print!("\n");
+            for x in 0..world.get_width() {
+                if world.should_draw(x,y) {
+                    print!("□");
+                } else {
+                    print!(" ");
+                }
+                    
+            }
+        }
+        print!("\n");
+    }
+}
+
+
 
 
 fn main() {
@@ -99,7 +124,7 @@ fn main() {
     world.randomize();
     loop {
         world = world.evolve();
-        draw(&world);
+        display::draw(&world);
         std::thread::sleep_ms(50);
     }
 }
