@@ -4,7 +4,7 @@ use std::collections::HashMap;
 use std::thread::sleep_ms;
 
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 enum CellState{
     Alive,
     Dead
@@ -25,7 +25,7 @@ impl Rand for CellState {
         }
     }
 }
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 struct World {
     width: WSize,
     height: WSize,
@@ -41,19 +41,31 @@ impl World {
         }}
         world
     }
+    fn evolve(&self) -> World {
+        let mut new_world = self.clone();
+        for y in 0..self.height { for x in 0..self.width {
+            new_world.set_state(x, y, self.decide_fate(x, y))
+        }}
+        new_world
+        
+    }
+
+    fn decide_fate(&self, x: WSize, y: WSize) -> CellState {
+        rand::random()
+    }
 
     fn is_alive(&self, x: WSize, y: WSize) -> bool {
         let key = (x, y);
         self.cells.get(&key) == Some(&CellState::Alive)
     }
 
-    fn set_state(&mut self, key: Point, value: CellState) {
-        self.cells.insert(key, value);
+    fn set_state(&mut self, x: WSize, y: WSize, value: CellState) {
+        self.cells.insert((x, y), value);
     }
 
     fn randomize(&mut self) {
         for y in 0..self.height { for x in 0..self.width { 
-            self.set_state((x, y), rand::random());    
+            self.set_state(x, y, rand::random());    
         }}
         
     }
@@ -84,8 +96,9 @@ fn draw(ref world: &World) {
 fn main() {
     println!("Hello");
     let mut world:World = World::new(30, 20);
+    world.randomize();
     loop {
-        world.randomize();
+        world = world.evolve();
         draw(&world);
         std::thread::sleep_ms(50);
     }
