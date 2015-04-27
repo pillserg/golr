@@ -1,6 +1,8 @@
 extern crate rand;
 use rand::{Rand, Rng};
 use std::collections::HashMap;
+use std::thread::sleep_ms;
+
 
 #[derive(Debug, PartialEq)]
 enum CellState{
@@ -68,7 +70,7 @@ fn draw(ref world: &World) {
         print!("\n");
         for x in 0..world.width {
             if world.is_alive(x,y) {
-                print!("#");
+                print!("□");
             } else {
                 print!(" ");
             }
@@ -82,7 +84,10 @@ fn draw(ref world: &World) {
 fn main() {
     println!("Hello");
     let mut world:World = World::new(30, 20);
-    world.randomize();
-    draw(&world);
+    loop {
+        world.randomize();
+        draw(&world);
+        std::thread::sleep_ms(50);
+    }
 }
 
