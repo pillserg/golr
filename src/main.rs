@@ -1,57 +1,88 @@
+extern crate rand;
+use rand::{Rand, Rng};
+use std::collections::HashMap;
+
+#[derive(Debug, PartialEq)]
 enum CellState{
     Alive,
     Dead
 }
 
 
-struct Cell {
-    x: i8,
-    y: i8,
-    state: CellState
-}
+type WSize = i8;
+type Point = (WSize, WSize);
 
 
-impl Cell {
-    fn is_alive(&self) -> bool {
-        match self.state {
-            CellState::Alive => true,
-            CellState::Dead => false
+impl Rand for CellState {
+    #[inline]
+    fn rand<R:Rng>(rng: &mut R) -> CellState {
+        let x: bool = rand::random();
+        match x {
+            true => CellState::Alive,
+            false => CellState::Dead
         }
     }
-
-
+}
+#[derive(Debug)]
+struct World {
+    width: WSize,
+    height: WSize,
+    cells: HashMap<Point, CellState>
 }
 
-fn print_cell_data (cell: &Cell) {
-    println!(
-        "x: {x}, y: {y}, state: {state}", 
-        x=cell.x,
-        y=cell.y,
-        state = match cell.state {
-            CellState::Dead => "dead",
-            CellState::Alive => "alive"
+
+impl World {
+    fn new(width: WSize, height: WSize)  -> World {
+        let mut world = World{width: width, height: height, cells: HashMap::new()};
+        for y in 0..height { for x in 0..width {
+            world.cells.insert((x, y), CellState::Dead);
+        }}
+        world
+    }
+
+    fn is_alive(&self, x: WSize, y: WSize) -> bool {
+        let key = (x, y);
+        self.cells.get(&key) == Some(&CellState::Alive)
+    }
+
+    fn set_state(&mut self, key: Point, value: CellState) {
+        self.cells.insert(key, value);
+    }
+
+    fn randomize(&mut self) {
+        for y in 0..self.height { for x in 0..self.width { 
+            self.set_state((x, y), rand::random());    
+        }}
+        
+    }
+}
+
+
+fn clear_screen() {
+    print!("\x1b[2J\n");
+}
+
+fn draw(ref world: &World) {
+    clear_screen();
+    for y in 0..world.height {
+        print!("\n");
+        for x in 0..world.width {
+            if world.is_alive(x,y) {
+                print!("#");
+            } else {
+                print!(" ");
+            }
+                
         }
-    );
+    }
+    print!("\n");
 }
+
 
 fn main() {
     println!("Hello");
-    let height = 10;
-    let width = height;
-
-    for y in 0..height {
-        for x in 0..width {
-            print_cell_data(&Cell{x: x, y: y, state: CellState::Alive});
-        }
-    }
-    let cell = Cell{x: 0, y: 0, state: CellState::Alive};
-    match cell {
-        Cell {state: CellState::Alive, ..} => println!("cell is alive"),
-        Cell {state: CellState::Dead, ..} => println!("cell is dead")
-    }  
-
-    if cell.is_alive() {
-        println!("We determined that cell is alive through 'is_alive' method");
-    }
+    let mut world:World = World::new(30, 20);
+    world.randomize();
+    draw(&world);
 }
 
