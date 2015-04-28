@@ -15,3 +15,7 @@ $ cargo build && cargo ./target/debug/golr -w 100 -h 30
  - Change console output to something else
  - make some api - allow usage as service for tornado_gol
  - ...
+
+# misc
+ - multirust is greate https://github.com/brson/multirust
+ - racer works - and thus is also greate https://github.com/phildawes/racer
