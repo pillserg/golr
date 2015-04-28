@@ -1,5 +1,6 @@
 # golr
-conways game of life in Rust - just playing around;
+
+Conway's Game of Life in Rust - just playing around;
 
  - works on nightly
  - install & run:
@@ -7,7 +8,7 @@ conways game of life in Rust - just playing around;
 ```
 $ git clone https://github.com/pillserg/golr.git
 $ cd golr
-$ cargo build && cargo ./target/debug/golr -w 100 -h 30
+$ cargo run -- -w 100 -h 30
 ```
 
 # todo
@@ -18,4 +19,4 @@ $ cargo build && cargo ./target/debug/golr -w 100 -h 30
 
 # misc
  - multirust is great https://github.com/brson/multirust
- - racer works - and thus is also greate https://github.com/phildawes/racer
+ - racer works - and thus is also great https://github.com/phildawes/racer
