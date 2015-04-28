@@ -1,11 +1,11 @@
-fn clear_screen() {
+pub fn clear_screen() {
     print!("\x1b[2J\n");
 }
 
 pub trait Drawable {
-    fn should_draw(&self, x: u8, y: u8) -> bool;
-    fn get_height(&self) -> u8;
-    fn get_width(&self) -> u8;
+    fn should_draw(&self, x: isize, y: isize) -> bool;
+    fn get_height(&self) -> isize;
+    fn get_width(&self) -> isize;
 }
 
 pub fn draw<T: Drawable>(ref world: &T) {

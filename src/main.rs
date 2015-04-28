@@ -5,7 +5,7 @@ use std::thread::sleep_ms;
 mod display;
 
 
-type Point = (u8, u8);
+type Point = (isize, isize);
 
 
 #[derive(Debug, PartialEq, Clone)]
@@ -25,20 +25,31 @@ impl Rand for CellState {
     }
 }
 
-trait Measurable {
-
-}
 
 #[derive(Debug, Clone)]
 struct World {
-    width: u8,
-    height: u8,
+    width: isize,
+    height: isize,
     cells: HashMap<Point, CellState>
 }
 
 
+
+    // def _get_siblings(self, x, y):
+    //     return [
+    //         (_x, _y) for _x in [x + 1, x - 1, x] for _y in [y + 1, y - 1, y] if (_x != x or _y != y) and 0 <= _x < self.width and 0 <= _y < self.height
+    //     ]
+
+    // def _decide_fate(self, cell, cell_num, row_num):
+        // num_alive_siblings = len(filter(bool, [self.cells[y][x] for (x, y) in self._get_siblings(cell_num, row_num)]))
+        // if (cell is not ALIVE and num_alive_siblings is 3) or (cell is ALIVE and 2 <= num_alive_siblings <= 3):
+        //     return ALIVE
+        // else:
+        //     return DEAD
+
+
 impl World {
-    fn new(width: u8, height: u8)  -> World {
+    fn new(width: isize, height: isize)  -> World {
         let mut world = World{width: width, height: height, cells: HashMap::new()};
         for y in 0..height { for x in 0..width {
             world.cells.insert((x, y), CellState::Dead);
@@ -54,16 +65,40 @@ impl World {
         
     }
 
-    fn decide_fate(&self, x: u8, y: u8) -> CellState {
-        rand::random()
+    fn get_sibling_coords(&self, x: isize, y: isize) -> Vec<Point> {
+        let mut coords = vec![];
+        for _x in [x + 1, x - 1, x].iter() {for _y in [y + 1, y - 1, y].iter() {
+            if (*_x != x || *_y != y) && 0 <= *_x && *_x < self.width && 0 <= *_y && *_y < self.height {
+                coords.push((*_x, *_y));
+            }
+        }}
+        coords
     }
 
-    fn is_alive(&self, x: u8, y: u8) -> bool {
+    fn decide_fate(&self, x: isize, y: isize) -> CellState {
+        
+        let mut num_alive_siblings = 0;
+
+        for (_x, _y) in self.get_sibling_coords(x, y) {
+            if self.is_alive(_x, _y) {
+                num_alive_siblings += 1
+            }
+        }
+
+        if (!self.is_alive(x, y) && num_alive_siblings == 3) ||  (self.is_alive(x, y) && 2 <= num_alive_siblings && num_alive_siblings <= 3) {
+            CellState::Alive
+        }
+        else {
+            CellState::Dead
+        }
+    }
+
+    fn is_alive(&self, x: isize, y: isize) -> bool {
         let key = (x, y);
         self.cells.get(&key) == Some(&CellState::Alive)
     }
 
-    fn set_state(&mut self, x: u8, y: u8, value: CellState) {
+    fn set_state(&mut self, x: isize, y: isize, value: CellState) {
         self.cells.insert((x, y), value);
     }
 
@@ -76,26 +111,28 @@ impl World {
 }
 
 impl display::Drawable for World {
-    fn should_draw(&self, x: u8, y: u8) -> bool {
+    fn should_draw(&self, x: isize, y: isize) -> bool {
         self.is_alive(x, y)
     }
-    fn get_height(&self) -> u8 {
+    fn get_height(&self) -> isize {
         self.height
     }
-    fn get_width(&self) -> u8 {
+    fn get_width(&self) -> isize {
         self.width
     }
 }
 
 
 fn main() {
-    println!("Hello");
-    let mut world:World = World::new(30, 20);
+    let FPS = 33;
+
+    let mut world:World = World::new(200, 30);
     world.randomize();
+    display::clear_screen();
     loop {
         world = world.evolve();
         display::draw(&world);
-        std::thread::sleep_ms(50);
+        std::thread::sleep_ms(FPS);
     }
 }
 
