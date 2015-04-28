@@ -17,5 +17,5 @@ $ cargo build && cargo ./target/debug/golr -w 100 -h 30
  - ...
 
 # misc
- - multirust is greate https://github.com/brson/multirust
+ - multirust is great https://github.com/brson/multirust
  - racer works - and thus is also greate https://github.com/phildawes/racer
