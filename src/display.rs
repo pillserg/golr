@@ -10,8 +10,17 @@ pub trait Drawable {
 
 pub fn draw<T: Drawable>(ref world: &T) {
     clear_screen();
+    for x in 0..world.get_width() + 2 {
+        if x % 2 != 0 {
+            print!(".");
+        } else {
+            print!(" ");
+        }
+        
+    }
     for y in 0..world.get_height() {
-        print!("\n");
+        print!("\n.");
+
         for x in 0..world.get_width() {
             if world.should_draw(x,y) {
                 print!("□");
@@ -20,6 +29,17 @@ pub fn draw<T: Drawable>(ref world: &T) {
             }
                 
         }
+        print!(".");
     }
     print!("\n");
+    for x in 0..world.get_width() + 2 {
+        if x % 2 != 0 {
+            print!(".");
+        } else {
+            print!(" ");
+        }
+        
+    }
+    print!("\n");
+    
 }
