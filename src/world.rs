@@ -1,7 +1,6 @@
 extern crate rand;
 
 use std::collections::HashMap;
-use std::env;
 
 use self::rand::{Rand, Rng};
 
@@ -52,14 +51,14 @@ impl World {
             new_world.set_state(x, y, self.decide_fate(x, y))
         }}
         new_world
-        
+
     }
 
     pub fn randomize(&mut self) {
-        for y in 0..self.height { for x in 0..self.width { 
-            self.set_state(x, y, rand::random());    
+        for y in 0..self.height { for x in 0..self.width {
+            self.set_state(x, y, rand::random());
         }}
-        
+
     }
 
     fn get_sibling_coords(&self, x: isize, y: isize) -> Vec<Point> {
@@ -72,7 +71,7 @@ impl World {
         coords
     }
 
-    fn decide_fate(&self, x: isize, y: isize) -> CellState {        
+    fn decide_fate(&self, x: isize, y: isize) -> CellState {
         let mut num_alive_siblings = 0;
         for (_x, _y) in self.get_sibling_coords(x, y) {
             if self.is_alive(_x, _y) {
