@@ -1,8 +1,6 @@
 extern crate argparse;
 use std::thread::sleep_ms;
-use std::process::exit;
-use std::env;
-use argparse::{ArgumentParser, StoreTrue, Store};
+use argparse::{ArgumentParser, Store};
 
 mod display;
 mod world;
@@ -17,25 +15,25 @@ fn main() {
         let mut ap = ArgumentParser::new();
         ap.set_description("Run golr.");
         ap.refer(&mut height).add_option(
-            &["-h", "--height"], 
-            Store, 
+            &["-h", "--height"],
+            Store,
             "World height"
         );
         ap.refer(&mut width).add_option(
-            &["-w", "--width"], 
-            Store, 
+            &["-w", "--width"],
+            Store,
             "World width"
         );
         ap.refer(&mut fps).add_option(
-            &["-f", "--fps"], 
-            Store, 
+            &["-f", "--fps"],
+            Store,
             "FPS"
         );
         ap.parse_args_or_exit();
     }
 
     let mut world: World = World::new(width, height);
-    
+
     world.randomize();
 
     display::clear_screen();
