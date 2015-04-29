@@ -1,44 +1,40 @@
-extern crate argparse;
+extern crate rustc_serialize;
+extern crate docopt;
 
 mod display;
 mod world;
 
+use docopt::Docopt;
 use std::thread::sleep_ms;
-use argparse::{ArgumentParser, Store};
+
+static USAGE: &'static str = "
+Usage:
+    golr [options]
+
+Options:
+    -h <height>, --height <height>              World height [default: 10]
+    -w <width>, --width <width>                 World width  [default: 10]
+    -f <fps>, --fps <fps>                       World fps    [default: 33]
+";
+
+#[derive(RustcDecodable, Debug)]
+struct CliArgs {
+    flag_width: isize,
+    flag_height: isize,
+    flag_fps: u32,
+}
 
 fn main() {
-    let mut width = 10;
-    let mut height = 10;
-    let mut fps = 33;
+    let args = Docopt::new(USAGE).and_then(|d| d.decode::<CliArgs>())
+                                 .unwrap_or_else(|e| e.exit());
 
-    {
-        let mut ap = ArgumentParser::new();
-        ap.set_description("Run golr.");
-        ap.refer(&mut height).add_option(
-            &["-h", "--height"],
-            Store,
-            "World height"
-        );
-        ap.refer(&mut width).add_option(
-            &["-w", "--width"],
-            Store,
-            "World width"
-        );
-        ap.refer(&mut fps).add_option(
-            &["-f", "--fps"],
-            Store,
-            "FPS"
-        );
-        ap.parse_args_or_exit();
-    }
-
-    let mut world = world::World::new(width, height);
+    let mut world = world::World::new(args.flag_width, args.flag_height);
 
     world.randomize();
 
     loop {
         world = world.evolve();
         println!("\x1b[2J\n{}", world);
-        std::thread::sleep_ms(fps);
+        std::thread::sleep_ms(args.flag_fps);
     }
 }

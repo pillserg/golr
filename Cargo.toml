@@ -1,7 +1,12 @@
 [package]
 name = "golr"
 version = "0.1.0"
-authors = ["Sergey pilyavskiy <pill.sv0@gmail.com>"]
+authors = [
+    "Sergey Pilyavskiy <pill.sv0@gmail.com>",
+    "Pavel Chernykh <pavel.v.chernykh@gmail.com>"
+]
+
 [dependencies]
 rand = "0.3"
-argparse = "*"
+rustc-serialize = "*"
+docopt = "*"
