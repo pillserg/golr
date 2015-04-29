@@ -1,11 +1,7 @@
 extern crate rand;
 
 use std::collections::HashMap;
-
-use self::rand::{Rand, Rng};
-
-use display;
-
+use std::fmt;
 
 type Point = (isize, isize);
 
@@ -17,9 +13,9 @@ enum CellState{
 }
 
 
-impl Rand for CellState {
+impl rand::Rand for CellState {
     #[inline]
-    fn rand<R:Rng>(_: &mut R) -> CellState {
+    fn rand<R:rand::Rng>(_: &mut R) -> CellState {
         match rand::random() {
             true => CellState::Alive,
             false => CellState::Dead
@@ -96,17 +92,23 @@ impl World {
     }
 }
 
-
-impl display::Drawable for World {
-    fn should_draw(&self, x: isize, y: isize) -> bool {
-        self.is_alive(x, y)
-    }
-
-    fn get_height(&self) -> isize {
-        self.height
-    }
-
-    fn get_width(&self) -> isize {
-        self.width
+impl fmt::Display for World {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        let mut buf = String::new();
+        for x in 0..self.width + 2 {
+            buf.push(if x == 0 { '┌' } else if x == self.width + 1 { '┐' } else { '─' });
+        }
+        buf.push('\n');
+        for y in 0..self.height {
+            buf.push('│');
+            for x in 0..self.width {
+                buf.push(if self.is_alive(x, y) { '*' } else { ' ' });
+            }
+            buf.push_str("│\n");
+        }
+        for x in 0..self.width + 2 {
+            buf.push(if x == 0 { '└' } else if x == self.width + 1 { '┘' } else { '─' });
+        }
+        write!(f, "{}", buf)
     }
 }
