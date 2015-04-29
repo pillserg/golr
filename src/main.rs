@@ -1,10 +1,10 @@
 extern crate argparse;
-use std::thread::sleep_ms;
-use argparse::{ArgumentParser, Store};
 
 mod display;
 mod world;
-use world::World;
+
+use std::thread::sleep_ms;
+use argparse::{ArgumentParser, Store};
 
 fn main() {
     let mut width = 10;
@@ -32,16 +32,13 @@ fn main() {
         ap.parse_args_or_exit();
     }
 
-    let mut world: World = World::new(width, height);
+    let mut world = world::World::new(width, height);
 
     world.randomize();
 
-    display::clear_screen();
-
     loop {
         world = world.evolve();
-        display::draw(&world);
+        println!("\x1b[2J\n{}", world);
         std::thread::sleep_ms(fps);
     }
 }
-
