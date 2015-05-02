@@ -10,39 +10,46 @@ pub struct World {
     width: isize,
     height: isize,
     generation: HashSet<Point>,
+    neighbours: HashMap<Point, usize>,
     age: usize,
 }
 
 impl World {
     pub fn new(width: isize, height: isize)  -> World {
         World { width: width, height: height, age: 0,
-                generation: HashSet::new() }
+                generation: HashSet::with_capacity((width * height) as usize),
+                neighbours: HashMap::with_capacity((width * height * 8) as usize) }
     }
 
     pub fn seed(mut self) -> World {
         self.generation = (0..self.width).cartesian_product(0..self.height)
             .filter(|_| random())
             .collect::<HashSet<Point>>();
+        self.calculate_neighbours();
         self
     }
 
     pub fn evolve(&mut self) -> &World {
-        let mut neighbours_counts = HashMap::new();
+        self.generation = self.neighbours.iter()
+            .filter(|&(n, c)| if self.generation.contains(n) { *c == 3 || *c == 2 } else { *c == 3 })
+            .map(|(n, _)| *n)
+            .collect::<HashSet<Point>>();
+        self.calculate_neighbours();
+        self.age += 1;
+        self
+    }
+
+    fn calculate_neighbours(&mut self) {
+        self.neighbours.clear();
         for &(x, y) in self.generation.iter() {
             let neighbours = (-1..2).cartesian_product(-1..2)
                                     .filter(|&(dx, dy)| dx != 0 || dy != 0)
                                     .map(|(dx, dy)| (dx + x, dy + y));
             for n in neighbours {
-                let counts = neighbours_counts.entry(n).or_insert(0);
+                let counts = self.neighbours.entry(n).or_insert(0);
                 *counts = *counts + 1;
             }
         }
-        self.generation = neighbours_counts.iter()
-            .filter(|&(n, c)| if self.generation.contains(n) { *c == 3 || *c == 2 } else { *c == 3 })
-            .map(|(n, _)| *n)
-            .collect::<HashSet<Point>>();
-        self.age += 1;
-        self
     }
 }
 
