@@ -1,94 +1,47 @@
-extern crate rand;
-
+use itertools::Itertools;
 use std::collections::HashMap;
 use std::fmt;
+use rand::random;
 
-type Point = (isize, isize);
-
-
-#[derive(Debug, PartialEq, Clone)]
-enum CellState{
-    Alive,
-    Dead
-}
-
-
-impl rand::Rand for CellState {
-    #[inline]
-    fn rand<R:rand::Rng>(_: &mut R) -> CellState {
-        match rand::random() {
-            true => CellState::Alive,
-            false => CellState::Dead
-        }
-    }
-}
-
+pub type Point = (isize, isize);
 
 #[derive(Debug, Clone)]
 pub struct World {
     width: isize,
     height: isize,
-    cells: HashMap<Point, CellState>
+    generation: Vec<Point>,
+    age: usize,
 }
-
 
 impl World {
     pub fn new(width: isize, height: isize)  -> World {
-        let mut world = World{width: width, height: height, cells: HashMap::new()};
-        for y in 0..height { for x in 0..width {
-            world.cells.insert((x, y), CellState::Dead);
-        }}
-        world
+        World { width: width, height: height, age: 0, generation: vec![] }
     }
 
-    pub fn evolve(&self) -> World {
-        let mut new_world = self.clone();
-        for y in 0..self.height { for x in 0..self.width {
-            new_world.set_state(x, y, self.decide_fate(x, y))
-        }}
-        new_world
-
+    pub fn seed(mut self) -> World {
+        self.generation = (0..self.width).cartesian_product(0..self.height)
+            .filter(|_| random())
+            .collect::<Vec<Point>>();
+        self
     }
 
-    pub fn randomize(&mut self) {
-        for y in 0..self.height { for x in 0..self.width {
-            self.set_state(x, y, rand::random());
-        }}
-
-    }
-
-    fn get_sibling_coords(&self, x: isize, y: isize) -> Vec<Point> {
-        let mut coords = vec![];
-        for _x in [x + 1, x - 1, x].iter() {for _y in [y + 1, y - 1, y].iter() {
-            if (*_x != x || *_y != y) && 0 <= *_x && *_x < self.width && 0 <= *_y && *_y < self.height {
-                coords.push((*_x, *_y));
-            }
-        }}
-        coords
-    }
-
-    fn decide_fate(&self, x: isize, y: isize) -> CellState {
-        let mut num_alive_siblings = 0;
-        for (_x, _y) in self.get_sibling_coords(x, y) {
-            if self.is_alive(_x, _y) {
-                num_alive_siblings += 1
+    pub fn evolve(&mut self) -> &World {
+        let mut neighbours_counts = HashMap::new();
+        for &(x, y) in &self.generation[..] {
+            let neighbours = (-1..2).cartesian_product(-1..2)
+                                    .filter(|&(dx, dy)| dx != 0 || dy != 0)
+                                    .map(|(dx, dy)| (dx + x, dy + y));
+            for n in neighbours {
+                let counts = neighbours_counts.entry(n).or_insert(0);
+                *counts = *counts + 1;
             }
         }
-        if (!self.is_alive(x, y) && num_alive_siblings == 3) ||  (self.is_alive(x, y) && 2 <= num_alive_siblings && num_alive_siblings <= 3) {
-            CellState::Alive
-        }
-        else {
-            CellState::Dead
-        }
-    }
-
-    fn is_alive(&self, x: isize, y: isize) -> bool {
-        let key = (x, y);
-        self.cells.get(&key) == Some(&CellState::Alive)
-    }
-
-    fn set_state(&mut self, x: isize, y: isize, value: CellState) {
-        self.cells.insert((x, y), value);
+        self.generation = neighbours_counts.iter()
+            .filter(|&(n, c)| if self.generation.contains(n) { *c == 3 || *c == 2 } else { *c == 3 })
+            .map(|(n, _)| *n)
+            .collect::<Vec<Point>>();
+        self.age += 1;
+        self
     }
 }
 
@@ -102,9 +55,16 @@ impl fmt::Display for World {
         for y in 0..self.height {
             buf.push('│');
             for x in 0..self.width {
-                buf.push(if self.is_alive(x, y) { '*' } else { ' ' });
+                buf.push(if self.generation.contains(&(x, y)) { '*' } else { ' ' });
             }
-            buf.push_str("│\n");
+            buf.push('|');
+            if y == 0 {
+                buf.push_str(&format!(" cells: {}", self.generation.len()));
+            }
+            if y == 1 {
+                buf.push_str(&format!(" age: {}", self.age));
+            }
+            buf.push('\n');
         }
         for x in 0..self.width + 2 {
             buf.push(if x == 0 { '└' } else if x == self.width + 1 { '┘' } else { '─' });

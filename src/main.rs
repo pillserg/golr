@@ -1,11 +1,15 @@
 extern crate rustc_serialize;
 extern crate docopt;
+extern crate rand;
+extern crate itertools;
 
 mod display;
 mod world;
 
 use docopt::Docopt;
 use std::thread::sleep_ms;
+
+use world::World;
 
 static USAGE: &'static str = "
 Usage:
@@ -27,14 +31,9 @@ struct CliArgs {
 fn main() {
     let args = Docopt::new(USAGE).and_then(|d| d.decode::<CliArgs>())
                                  .unwrap_or_else(|e| e.exit());
-
-    let mut world = world::World::new(args.flag_width, args.flag_height);
-
-    world.randomize();
-
+    let mut world = World::new(args.flag_width, args.flag_height).seed();
     loop {
-        world = world.evolve();
-        println!("\x1b[2J\n{}", world);
+        println!("\x1b[2J\n{}", world.evolve());
         std::thread::sleep_ms(args.flag_fps);
     }
 }
