@@ -47,7 +47,7 @@ impl World {
 
 impl fmt::Display for World {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        let mut buf = String::new();
+        let mut buf = String::with_capacity(((self.width + 2) * (self.height + 2) + 50) as usize);
         for x in 0..self.width + 2 {
             buf.push(if x == 0 { '┌' } else if x == self.width + 1 { '┐' } else { '─' });
         }
