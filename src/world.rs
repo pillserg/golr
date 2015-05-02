@@ -1,5 +1,5 @@
 use itertools::Itertools;
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use std::fmt;
 use rand::random;
 
@@ -9,25 +9,26 @@ pub type Point = (isize, isize);
 pub struct World {
     width: isize,
     height: isize,
-    generation: Vec<Point>,
+    generation: HashSet<Point>,
     age: usize,
 }
 
 impl World {
     pub fn new(width: isize, height: isize)  -> World {
-        World { width: width, height: height, age: 0, generation: vec![] }
+        World { width: width, height: height, age: 0,
+                generation: HashSet::new() }
     }
 
     pub fn seed(mut self) -> World {
         self.generation = (0..self.width).cartesian_product(0..self.height)
             .filter(|_| random())
-            .collect::<Vec<Point>>();
+            .collect::<HashSet<Point>>();
         self
     }
 
     pub fn evolve(&mut self) -> &World {
         let mut neighbours_counts = HashMap::new();
-        for &(x, y) in &self.generation[..] {
+        for &(x, y) in self.generation.iter() {
             let neighbours = (-1..2).cartesian_product(-1..2)
                                     .filter(|&(dx, dy)| dx != 0 || dy != 0)
                                     .map(|(dx, dy)| (dx + x, dy + y));
@@ -39,7 +40,7 @@ impl World {
         self.generation = neighbours_counts.iter()
             .filter(|&(n, c)| if self.generation.contains(n) { *c == 3 || *c == 2 } else { *c == 3 })
             .map(|(n, _)| *n)
-            .collect::<Vec<Point>>();
+            .collect::<HashSet<Point>>();
         self.age += 1;
         self
     }
