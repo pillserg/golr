@@ -16,8 +16,7 @@ pub struct World {
 
 impl World {
     pub fn new(width: isize, height: isize)  -> World {
-        World { width: width, height: height, age: 0,
-                generation: HashSet::with_capacity((width * height) as usize),
+        World { width: width, height: height, age: 0, generation: HashSet::new(),
                 neighbours: HashMap::with_capacity((width * height * 8) as usize) }
     }
 
