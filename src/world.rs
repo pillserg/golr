@@ -22,8 +22,8 @@ impl World {
 
     pub fn seed(mut self) -> World {
         self.generation = (0..self.width).cartesian_product(0..self.height)
-            .filter(|_| random())
-            .collect::<HashSet<Point>>();
+                                         .filter(|_| random())
+                                         .collect::<HashSet<Point>>();
         self.calculate_neighbours();
         self
     }
