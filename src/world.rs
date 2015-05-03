@@ -30,9 +30,9 @@ impl World {
 
     pub fn evolve(&mut self) -> &World {
         self.generation = self.neighbours.iter()
-            .filter(|&(n, c)| if self.generation.contains(n) { *c == 3 || *c == 2 } else { *c == 3 })
-            .map(|(n, _)| *n)
-            .collect::<HashSet<Point>>();
+                              .filter(|&(n, c)| self.decide_fate(n, *c))
+                              .map(|(n, _)| *n)
+                              .collect::<HashSet<Point>>();
         self.calculate_neighbours();
         self.age += 1;
         self
@@ -45,9 +45,16 @@ impl World {
                                     .filter(|&(dx, dy)| dx != 0 || dy != 0)
                                     .map(|(dx, dy)| (dx + x, dy + y));
             for n in neighbours {
-                let counts = self.neighbours.entry(n).or_insert(0);
-                *counts = *counts + 1;
+                *self.neighbours.entry(n).or_insert(0) += 1;
             }
+        }
+    }
+
+    fn decide_fate(&self) -> bool {
+        if self.generation.contains(n) {
+            *c == 3 || *c == 2
+        } else {
+            *c == 3
         }
     }
 }
