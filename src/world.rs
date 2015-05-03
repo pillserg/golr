@@ -3,7 +3,7 @@ use std::collections::{HashMap, HashSet};
 use std::fmt;
 use rand::random;
 
-pub type Point = (isize, isize);
+type Point = (isize, isize);
 
 #[derive(Debug, Clone)]
 pub struct World {
@@ -50,11 +50,11 @@ impl World {
         }
     }
 
-    fn decide_fate(&self) -> bool {
-        if self.generation.contains(n) {
-            *c == 3 || *c == 2
+    fn decide_fate(&self, p: &Point, c: usize) -> bool {
+        if self.generation.contains(p) {
+            c == 3 || c == 2
         } else {
-            *c == 3
+            c == 3
         }
     }
 }
