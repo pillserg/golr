@@ -1,6 +1,7 @@
 use itertools::Itertools;
 use std::collections::{HashMap, HashSet};
 use std::fmt;
+use std::mem;
 use rand::random;
 
 type Point = (isize, isize);
@@ -16,8 +17,13 @@ pub struct World {
 
 impl World {
     pub fn new(width: isize, height: isize)  -> World {
-        World { width: width, height: height, age: 0, generation: HashSet::new(),
-                neighbours: HashMap::with_capacity((width * height * 8) as usize) }
+        World {
+            width: width,
+            height: height,
+            age: 0,
+            generation: HashSet::new(),
+            neighbours: HashMap::with_capacity(((width * height) as usize ) * mem::size_of::<usize>())
+        }
     }
 
     pub fn seed(mut self) -> World {
