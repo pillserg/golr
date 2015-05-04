@@ -16,16 +16,16 @@ Usage:
     golr [options]
 
 Options:
-    -h <height>, --height <height>              World height [default: 10]
-    -w <width>, --width <width>                 World width  [default: 10]
-    -f <fps>, --fps <fps>                       World fps    [default: 33]
+    -h <height>, --height <height>  World height, points                 [default: 25]
+    -w <width>, --width <width>     World width, points                  [default: 80]
+    -p <period>, --period <period>  World generational change period, ms [default: 350]
 ";
 
 #[derive(RustcDecodable, Debug)]
 struct CliArgs {
     flag_width: isize,
     flag_height: isize,
-    flag_fps: u32,
+    flag_period: u32,
 }
 
 fn main() {
@@ -34,6 +34,6 @@ fn main() {
     let mut world = World::new(args.flag_width, args.flag_height).seed();
     loop {
         println!("\x1b[2J\n{}", world.evolve());
-        std::thread::sleep_ms(args.flag_fps);
+        std::thread::sleep_ms(args.flag_period);
     }
 }
