@@ -47,13 +47,15 @@ impl World {
     fn calculate_neighbours(&mut self) {
         self.neighbours.clear();
         for &(x, y) in self.generation.iter() {
-            let neighbours = (-1..2).cartesian_product(-1..2)
-                                    .filter(|&(dx, dy)| dx != 0 || dy != 0)
-                                    .map(|(dx, dy)| (dx + x, dy + y));
-            for n in neighbours {
-                *self.neighbours.entry(n).or_insert(0) += 1;
-            }
-        }
+            (-1..2)
+            .cartesian_product(-1..2)
+            .filter(|&(dx, dy)| dx != 0 || dy != 0)
+            .map(|(dx, dy)| (dx + x, dy + y))
+            .fold(&mut self.neighbours, |acc, point| {
+                *acc.entry(point).or_insert(0) += 1;
+                acc
+            });
+        };
     }
 
     fn decide_fate(&self, p: &Point, c: usize) -> bool {
