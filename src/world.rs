@@ -21,6 +21,11 @@ impl World {
     }
 
     pub fn seed(mut self) -> World {
+        let cur_gen_cap = self.generation.capacity();
+        let max_gen_cap = (self.width * self.height) as usize;
+        if cur_gen_cap < max_gen_cap {
+            self.generation.reserve(max_gen_cap - cur_gen_cap);
+        }
         (0..self.width).cartesian_product(0..self.height)
                        .filter(|_| random())
                        .fold(&mut self.generation, |acc, point| {
@@ -32,10 +37,15 @@ impl World {
     }
 
     pub fn evolve(&mut self) -> &World {
-        self.generation = self.neighbours.iter()
-                              .filter(|&(n, c)| self.decide_fate(n, *c))
-                              .map(|(n, _)| *n)
-                              .collect::<HashSet<Point>>();
+        let mut next_generation = HashSet::with_capacity(self.generation.len() * 2);
+        self.neighbours.iter()
+            .filter(|&(n, c)| self.decide_fate(n, *c))
+            .map(|(n, _)| *n)
+            .fold(&mut next_generation, |acc, point| {
+                acc.insert(point);
+                acc
+            });
+        self.generation = next_generation;
         self.calculate_neighbours();
         self.age += 1;
         self
