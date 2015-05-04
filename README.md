@@ -8,7 +8,7 @@ Conway's Game of Life in Rust - just playing around;
 ```
 $ git clone https://github.com/pillserg/golr.git
 $ cd golr
-$ cargo run -- -w 100 -h 30
+$ cargo run -- -w 100 -h 30 -p 66
 ```
 
 # todo
