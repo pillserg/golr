@@ -98,6 +98,6 @@ impl fmt::Display for World {
         for x in 0..self.width + 2 {
             buf.push(if x == 0 { '└' } else if x == self.width + 1 { '┘' } else { '─' });
         }
-        write!(f, "{}", buf)
+        f.write_str(&buf)
     }
 }
