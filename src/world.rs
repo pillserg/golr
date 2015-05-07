@@ -17,16 +17,11 @@ pub struct World {
 impl World {
     pub fn new(width: isize, height: isize)  -> World {
         World { width: width, height: height, age: 0,
-                generation: HashSet::new(), neighbours: HashMap::new(), }
+                generation: HashSet::with_capacity((width * height) as usize), 
+                neighbours: HashMap::new(), }
     }
 
     pub fn seed(mut self, maybe_seed: Option<HashSet<Point>>) -> World {
-        let cur_gen_cap = self.generation.capacity();
-        let max_gen_cap = (self.width * self.height) as usize;
-        if cur_gen_cap < max_gen_cap {
-            self.generation.reserve(max_gen_cap - cur_gen_cap);
-        }
-
         match maybe_seed {
             Some(seed) => self.generation = seed.clone(),
             None => {
