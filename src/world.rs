@@ -3,7 +3,7 @@ use std::collections::{HashMap, HashSet};
 use std::fmt;
 use rand::random;
 
-type Point = (isize, isize);
+pub type Point = (isize, isize);
 
 #[derive(Debug, Clone)]
 pub struct World {
@@ -20,18 +20,24 @@ impl World {
                 generation: HashSet::new(), neighbours: HashMap::new(), }
     }
 
-    pub fn seed(mut self) -> World {
+    pub fn seed(mut self, maybe_seed: Option<HashSet<Point>>) -> World {
         let cur_gen_cap = self.generation.capacity();
         let max_gen_cap = (self.width * self.height) as usize;
         if cur_gen_cap < max_gen_cap {
             self.generation.reserve(max_gen_cap - cur_gen_cap);
         }
-        (0..self.width).cartesian_product(0..self.height)
-                       .filter(|_| random())
-                       .fold(&mut self.generation, |acc, point| {
-                            acc.insert(point);
-                            acc
-                       });
+
+        match maybe_seed {
+            Some(seed) => self.generation = seed.clone(),
+            None => {
+                (0..self.width).cartesian_product(0..self.height)
+                    .filter(|_| random())
+                    .fold(&mut self.generation, |acc, point| {
+                        acc.insert(point);
+                        acc
+                    });
+            }
+        };
         self.calculate_neighbours();
         self
     }
@@ -73,6 +79,7 @@ impl World {
         }
     }
 }
+
 
 impl fmt::Display for World {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
