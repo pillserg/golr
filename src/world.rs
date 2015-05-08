@@ -29,6 +29,14 @@ impl World {
         self
     }
 
+    pub fn get_size(&self) -> (isize, isize) {
+        (self.width, self.height)
+    }
+
+    pub fn get_generation(&self) -> &HashSet<Point> {
+        &self.generation
+    }
+
     pub fn evolve(&mut self) -> &World {
         let mut next_generation = HashSet::with_capacity(self.generation.len() * 2);
         self.neighbours.iter()

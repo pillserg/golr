@@ -4,15 +4,19 @@ extern crate docopt;
 extern crate itertools;
 extern crate rustc_serialize;
 extern crate unicode_segmentation;
+// piston stuff
+extern crate piston;
+extern crate graphics;
+extern crate glutin_window;
+extern crate opengl_graphics;
 
-mod display;
+mod piston_app;
+mod console_app;
 mod world;
 mod parser;
 mod util;
 
-use std::thread::sleep_ms;
 use docopt::Docopt;
-
 use world::World;
 
 
@@ -39,21 +43,7 @@ struct CliArgs {
 }
 
 
-fn start_console_loop(world: &mut World, period: u64) {
-    print!("\x1b[2J");
-    loop {
-        let t_start = util::time_ms();
-        println!("\x1b[H{}", world.evolve());
-        let t_taken = util::time_ms() - t_start;
-
-        if t_taken < period {
-            std::thread::sleep_ms((period - t_taken) as u32);
-        };
-    }
-}
-
 fn main() {
-
     let args = Docopt::new(USAGE)
         .and_then(|d| d.decode::<CliArgs>())
         .unwrap_or_else(|e| e.exit());
@@ -69,7 +59,8 @@ fn main() {
     let mut world = World::new(args.flag_width, args.flag_height).seed(seed);
 
     match args.flag_render {
-        0 => start_console_loop(&mut world, args.flag_period),
+        0 => console_app::start_console_app(&mut world, args.flag_period),
+        1 => piston_app::start_piston_app(world, args.flag_period),
         _ => panic!("Unknown render engine")
     };
 }
