@@ -22,10 +22,11 @@ Usage:
 
 Options:
     --help                                      Show this message
-    -h <height>, --height <height>              World height, points                 [default: 25]
-    -w <width>, --width <width>                 World width, points                  [default: 80]
-    -p <period>, --period <period>              World generational change period, ms [default: 350]
+    -h <height>, --height <height>              World height, points                         [default: 25]
+    -w <width>, --width <width>                 World width, points                          [default: 80]
+    -p <period>, --period <period>              World generational change period, ms         [default: 350]
     -i <inputfile>, --inputfile <inputfile>     Populate world from file
+    -r <render>, --render <render>              Choose render engine [0-console | 1-piston]  [default: 0]
 ";
 
 #[derive(RustcDecodable, Debug)]
@@ -34,8 +35,22 @@ struct CliArgs {
     flag_height: isize,
     flag_period: u64,
     flag_inputfile: String,
+    flag_render: isize,
 }
 
+
+fn start_console_loop(world: &mut World, period: u64) {
+    print!("\x1b[2J");
+    loop {
+        let t_start = util::time_ms();
+        println!("\x1b[H{}", world.evolve());
+        let t_taken = util::time_ms() - t_start;
+
+        if t_taken < period {
+            std::thread::sleep_ms((period - t_taken) as u32);
+        };
+    }
+}
 
 fn main() {
 
@@ -53,16 +68,8 @@ fn main() {
 
     let mut world = World::new(args.flag_width, args.flag_height).seed(seed);
 
-    print!("\x1b[2J");
-
-    loop {
-        let t_start = util::time_ms();
-        println!("\x1b[H{}", world.evolve());
-        let t_taken = util::time_ms() - t_start;
-        
-        if t_taken < args.flag_period {
-            std::thread::sleep_ms((args.flag_period - t_taken) as u32);    
-        };
-
-    }
+    match args.flag_render {
+        0 => start_console_loop(&mut world, args.flag_period),
+        _ => panic!("Unknown render engine")
+    };
 }
