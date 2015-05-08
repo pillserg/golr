@@ -69,7 +69,7 @@ pub fn start_piston_app(world: World, period: u64) {
         world: world
     };
 
-    for e in window.events().max_fps(30).ups(30) {
+    for e in window.events().max_fps(30).ups(period) {
         if let Some(r) = e.render_args() {
             app.render(&r);
         }

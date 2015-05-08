@@ -22,9 +22,11 @@ impl World {
     }
 
     pub fn seed(mut self, seed: Option<HashSet<Point>>) -> World {
-        self.generation = seed.unwrap_or((0..self.width).cartesian_product(0..self.height)
-                                                        .filter(|_| random())
-                                                        .collect::<HashSet<Point>>());
+        self.generation = seed.unwrap_or(
+            (0..self.width).cartesian_product(0..self.height)
+            .filter(|_| random())
+            .collect::<HashSet<Point>>()
+        );
         self.calculate_neighbours();
         self
     }
