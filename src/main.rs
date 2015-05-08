@@ -7,16 +7,13 @@ extern crate unicode_segmentation;
 mod display;
 mod world;
 mod parser;
+mod util;
 
 use std::thread::sleep_ms;
 use docopt::Docopt;
-use std::path::Path;
-use std::fs::File;
-use std::error::Error;
-use std::io::Read;
-
 
 use world::World;
+
 
 static USAGE: &'static str = "
 Usage:
@@ -38,22 +35,19 @@ struct CliArgs {
     flag_inputfile: String,
 }
 
+
 fn main() {
 
-    let args = Docopt::new(USAGE).and_then(|d| d.decode::<CliArgs>())
-                                 .unwrap_or_else(|e| e.exit());
+    let args = Docopt::new(USAGE)
+        .and_then(|d| d.decode::<CliArgs>())
+        .unwrap_or_else(|e| e.exit());
 
-    let mut seed = None;
-    if !args.flag_inputfile.is_empty() {
-        let path = Path::new(&args.flag_inputfile);
-        let mut data = String::new();
-
-        let mut file = File::open(&path)
-            .unwrap_or_else(|_| {println!("Can't open {}", path.display()); ::std::process::exit(1)});
-        file.read_to_string(&mut data)
-            .unwrap_or_else(|_| {println!("Can't read {}", path.display()); ::std::process::exit(1)});
-        seed = Some(parser::parse_plaintext(data)
-            .unwrap_or_else(|_| {println!("Can't parse {}", path.display()); ::std::process::exit(1)}));
+    let seed = if args.flag_inputfile.is_empty() {
+        None
+    } else {
+        util::read_file_to_string(&args.flag_inputfile)
+            .and_then(|d: String| Ok(Some(parser::parse_plaintext(d))))
+            .unwrap_or(None)
     };
 
     let mut world = World::new(args.flag_width, args.flag_height).seed(seed);

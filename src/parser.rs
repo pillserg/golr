@@ -3,7 +3,7 @@ use std::collections::HashSet;
 use world::Point;
 
 
-pub fn parse_plaintext(data: String) -> Result<HashSet<Point>, &'static str> {
+pub fn parse_plaintext(data: String) -> HashSet<Point> {
     let mut ret: HashSet<Point> = HashSet::new();
 
     for (row_num, row) in data.split("\n")
@@ -16,6 +16,6 @@ pub fn parse_plaintext(data: String) -> Result<HashSet<Point>, &'static str> {
             };
         };
     };
-    Result::Ok(ret)
+    ret
 }
     
