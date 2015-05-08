@@ -17,22 +17,14 @@ pub struct World {
 impl World {
     pub fn new(width: isize, height: isize)  -> World {
         World { width: width, height: height, age: 0,
-                generation: HashSet::with_capacity((width * height) as usize), 
+                generation: HashSet::with_capacity((width * height) as usize),
                 neighbours: HashMap::new(), }
     }
 
-    pub fn seed(mut self, maybe_seed: Option<HashSet<Point>>) -> World {
-        match maybe_seed {
-            Some(seed) => self.generation = seed.clone(),
-            None => {
-                (0..self.width).cartesian_product(0..self.height)
-                    .filter(|_| random())
-                    .fold(&mut self.generation, |acc, point| {
-                        acc.insert(point);
-                        acc
-                    });
-            }
-        };
+    pub fn seed(mut self, seed: Option<HashSet<Point>>) -> World {
+        self.generation = seed.unwrap_or((0..self.width).cartesian_product(0..self.height)
+                                                        .filter(|_| random())
+                                                        .collect::<HashSet<Point>>());
         self.calculate_neighbours();
         self
     }

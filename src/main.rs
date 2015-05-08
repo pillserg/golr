@@ -24,7 +24,7 @@ Options:
     -h <height>, --height <height>              World height, points                 [default: 25]
     -w <width>, --width <width>                 World width, points                  [default: 80]
     -p <period>, --period <period>              World generational change period, ms [default: 350]
-    -i <inputfile>, --inputfile <inputfile>     populate world from file
+    -i <inputfile>, --inputfile <inputfile>     Populate world from file
 ";
 
 #[derive(RustcDecodable, Debug)]
