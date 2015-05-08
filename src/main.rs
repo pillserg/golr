@@ -1,7 +1,8 @@
-extern crate rustc_serialize;
-extern crate docopt;
 extern crate rand;
+extern crate time;
+extern crate docopt;
 extern crate itertools;
+extern crate rustc_serialize;
 extern crate unicode_segmentation;
 
 mod display;
@@ -31,7 +32,7 @@ Options:
 struct CliArgs {
     flag_width: isize,
     flag_height: isize,
-    flag_period: u32,
+    flag_period: u64,
     flag_inputfile: String,
 }
 
@@ -55,7 +56,13 @@ fn main() {
     print!("\x1b[2J");
 
     loop {
+        let t_start = util::time_ms();
         println!("\x1b[H{}", world.evolve());
-        std::thread::sleep_ms(args.flag_period);
+        let t_taken = util::time_ms() - t_start;
+        
+        if t_taken < args.flag_period {
+            std::thread::sleep_ms((args.flag_period - t_taken) as u32);    
+        };
+
     }
 }

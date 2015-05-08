@@ -8,6 +8,7 @@ authors = [
 
 [dependencies]
 rand = "0.3"
+time = "0.1"
 rustc-serialize = "*"
 docopt = "*"
 itertools = "*"
