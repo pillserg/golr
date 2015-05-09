@@ -38,7 +38,7 @@ struct CliArgs {
     flag_width: isize,
     flag_height: isize,
     flag_period: u64,
-    flag_inputfile: String,
+    flag_inputfile: Option<String>,
     flag_render: isize,
 }
 
@@ -48,13 +48,10 @@ fn main() {
         .and_then(|d| d.decode::<CliArgs>())
         .unwrap_or_else(|e| e.exit());
 
-    let seed = if args.flag_inputfile.is_empty() {
-        None
-    } else {
-        util::read_file_to_string(&args.flag_inputfile)
-            .and_then(|d: String| Ok(Some(parser::parse_plaintext(d))))
-            .unwrap_or(None)
-    };
+    let seed = args.flag_inputfile.as_ref()
+                   .and_then(|fif| util::read_file_to_string(fif)
+                                  .and_then(|d: String| Ok(Some(parser::parse_plaintext(d))))
+                                  .unwrap_or(None));
 
     let mut world = World::new(args.flag_width, args.flag_height).seed(seed);
 
