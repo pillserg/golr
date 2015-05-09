@@ -43,7 +43,7 @@ impl App {
         });
     }
 
-    fn update(&mut self, args: &UpdateArgs) {
+    fn update(&mut self, _: &UpdateArgs) {
         self.world.evolve();
     }
 }
