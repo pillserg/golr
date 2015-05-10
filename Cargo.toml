@@ -12,7 +12,6 @@ time = "0.1"
 rustc-serialize = "*"
 docopt = "*"
 itertools = "*"
-unicode-segmentation = "0.1.0"
 
 [dependencies.piston]
 git = "https://github.com/PistonDevelopers/piston.git"

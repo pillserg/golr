@@ -3,7 +3,6 @@ extern crate time;
 extern crate docopt;
 extern crate itertools;
 extern crate rustc_serialize;
-extern crate unicode_segmentation;
 // piston stuff
 extern crate piston;
 extern crate graphics;
