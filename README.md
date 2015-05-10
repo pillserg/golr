@@ -29,7 +29,7 @@ cargo run -- -w 100 -h 30 -p 66 -r 1 --cell-size 10 -i src/gardens/gosper.txt
 ```
 
 # Contribute
-File an issue. Disscuss. Make a decision. Implement.
+Open an issue. Disscuss. Implement. Send PR.
 
 # Misc
  - [multirust][multirust] is great https://github.com/brson/multirust
