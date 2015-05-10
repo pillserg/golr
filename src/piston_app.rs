@@ -71,7 +71,9 @@ pub fn start_piston_app(world: World, period: u64, cell_size: u32, gl_version: u
         world: world
     };
 
-    for e in window.events().max_fps(30).ups(period) {
+    let ups = 1000/period;
+
+    for e in window.events().max_fps(30).ups(ups) {
         if let Some(r) = e.render_args() {
             app.render(&r);
         }
