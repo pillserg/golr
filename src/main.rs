@@ -31,6 +31,8 @@ Options:
     -p <period>, --period <period>              World generational change period, ms         [default: 350]
     -i <inputfile>, --inputfile <inputfile>     Populate world from file
     -r <render>, --render <render>              Choose render engine [0-console | 1-piston]  [default: 0]
+    --cell-size <cell_size>                     Choose cell size (Only for visual renderers) [default: 2]
+    --gl-version <gl_version>                   OpenGl version [32, 30]                      [default: 32]
 ";
 
 #[derive(RustcDecodable, Debug)]
@@ -40,6 +42,8 @@ struct CliArgs {
     flag_period: u64,
     flag_inputfile: Option<String>,
     flag_render: isize,
+    flag_cell_size: u32,
+    flag_gl_version: u32,
 }
 
 
@@ -57,7 +61,7 @@ fn main() {
 
     match args.flag_render {
         0 => console_app::start_console_app(&mut world, args.flag_period),
-        1 => piston_app::start_piston_app(world, args.flag_period),
+        1 => piston_app::start_piston_app(world, args.flag_period, args.flag_cell_size, args.flag_gl_version),
         _ => panic!("Unknown render engine")
     };
 }

@@ -48,9 +48,11 @@ impl App {
     }
 }
 
-pub fn start_piston_app(world: World, period: u64) {
-    let cell_size: u32 = 5;
-    let opengl = OpenGL::_3_2;
+pub fn start_piston_app(world: World, period: u64, cell_size: u32, gl_version: u32) {
+    let opengl = match gl_version {
+        30 => OpenGL::_3_0,
+        _ => OpenGL::_3_2
+    };
     let (width, height) = world.get_size();
     // Create an Glutin window.
     let window = Window::new(
