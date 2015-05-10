@@ -1,6 +1,5 @@
 use itertools::Itertools;
 use std::collections::{HashMap, HashSet};
-use std::fmt;
 use rand::random;
 
 pub type Point = (isize, isize);
@@ -31,11 +30,15 @@ impl World {
         self
     }
 
-    pub fn get_size(&self) -> (isize, isize) {
+    pub fn size(&self) -> (isize, isize) {
         (self.width, self.height)
     }
 
-    pub fn get_generation(&self) -> &HashSet<Point> {
+    pub fn age(&self) -> usize {
+        self.age
+    }
+
+    pub fn generation(&self) -> &HashSet<Point> {
         &self.generation
     }
 
@@ -74,34 +77,5 @@ impl World {
         } else {
             c == 3
         }
-    }
-}
-
-
-impl fmt::Display for World {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        let mut buf = String::with_capacity(((self.width + 2) * (self.height + 2) + 50) as usize);
-        for x in 0..self.width + 2 {
-            buf.push(if x == 0 { '┌' } else if x == self.width + 1 { '┐' } else { '─' });
-        }
-        buf.push('\n');
-        for y in 0..self.height {
-            buf.push('│');
-            for x in 0..self.width {
-                buf.push(if self.generation.contains(&(x, y)) { '*' } else { ' ' });
-            }
-            buf.push('|');
-            if y == 0 {
-                buf.push_str(&format!(" cells: {}", self.generation.len()));
-            }
-            if y == 1 {
-                buf.push_str(&format!(" age: {}", self.age));
-            }
-            buf.push('\n');
-        }
-        for x in 0..self.width + 2 {
-            buf.push(if x == 0 { '└' } else if x == self.width + 1 { '┘' } else { '─' });
-        }
-        f.write_str(&buf)
     }
 }

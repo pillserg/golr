@@ -22,7 +22,7 @@ impl App {
         const BG_GOLOR: [f32; 4] = [0.150, 0.164, 0.176, 1.0];
         const CELL_COLOR: [f32; 4] = [1.0, 1.0, 1.0, 1.0];
 
-        let cells = self.world.get_generation();
+        let cells = self.world.generation();
         let cell_size = self.cell_size as f64;
         let offset = OFFSET as f64;
 
@@ -53,7 +53,7 @@ pub fn start_piston_app(world: World, period: u64, cell_size: u32, gl_version: u
         30 => OpenGL::_3_0,
         _ => OpenGL::_3_2
     };
-    let (width, height) = world.get_size();
+    let (width, height) = world.size();
     // Create an Glutin window.
     let window = Window::new(
         opengl,
