@@ -52,9 +52,8 @@ fn main() {
         .unwrap_or_else(|e| e.exit());
 
     let seed = args.flag_inputfile.as_ref()
-                   .and_then(|fif| util::read_file_to_string(fif)
-                                  .and_then(|d: String| Ok(Some(parser::parse_plaintext(d))))
-                                  .unwrap_or(None));
+                   .and_then(|fif| util::read_file_to_string(fif).ok()
+                                   .and_then(|d| Some(parser::parse_plaintext(d))));
 
     let mut world = World::new(args.flag_width, args.flag_height).seed(seed);
 
