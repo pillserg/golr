@@ -4,7 +4,6 @@ use rand::random;
 
 pub type Point = (isize, isize);
 
-#[derive(Debug, Clone)]
 pub struct World {
     width: isize,
     height: isize,
@@ -13,11 +12,16 @@ pub struct World {
     age: usize,
 }
 
+
 impl World {
     pub fn new(width: isize, height: isize)  -> World {
-        World { width: width, height: height, age: 0,
-                generation: HashSet::with_capacity((width * height) as usize),
-                neighbours: HashMap::new(), }
+        World {
+            width: width,
+            height: height,
+            age: 0,
+            generation: HashSet::with_capacity((width * height) as usize),
+            neighbours: HashMap::new()
+        }
     }
 
     pub fn seed(mut self, seed: Option<HashSet<Point>>) -> World {
@@ -28,18 +32,6 @@ impl World {
         );
         self.calculate_neighbours();
         self
-    }
-
-    pub fn size(&self) -> (isize, isize) {
-        (self.width, self.height)
-    }
-
-    pub fn age(&self) -> usize {
-        self.age
-    }
-
-    pub fn generation(&self) -> &HashSet<Point> {
-        &self.generation
     }
 
     pub fn evolve(&mut self) -> &World {
@@ -57,11 +49,14 @@ impl World {
         self
     }
 
+    pub fn size(&self) -> (isize, isize) {(self.width, self.height)}
+    pub fn age(&self) -> usize {self.age}
+    pub fn generation(&self) -> &HashSet<Point> {&self.generation}
+
     fn calculate_neighbours(&mut self) {
         self.neighbours.clear();
         for &(x, y) in self.generation.iter() {
-            (-1..2)
-            .cartesian_product(-1..2)
+            (-1..2).cartesian_product(-1..2)
             .filter(|&(dx, dy)| dx != 0 || dy != 0)
             .map(|(dx, dy)| (dx + x, dy + y))
             .fold(&mut self.neighbours, |acc, point| {
@@ -71,11 +66,10 @@ impl World {
         };
     }
 
-    fn decide_fate(&self, p: &Point, c: usize) -> bool {
-        if self.generation.contains(p) {
-            c == 3 || c == 2
-        } else {
-            c == 3
+    fn decide_fate(&self, point: &Point, num_neighbours: usize) -> bool {
+        match self.generation.contains(point) {
+            true => num_neighbours == 3 || num_neighbours == 2,
+            false => num_neighbours == 3
         }
     }
 }
