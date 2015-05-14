@@ -34,7 +34,7 @@ Options:
     --gl-version <gl_version>                   OpenGl version [32, 30]                      [default: 32]
 ";
 
-#[derive(RustcDecodable, Debug)]
+#[derive(RustcDecodable)]
 struct CliArgs {
     flag_width: isize,
     flag_height: isize,
@@ -51,9 +51,9 @@ fn main() {
         .and_then(|d| d.decode::<CliArgs>())
         .unwrap_or_else(|e| e.exit());
 
-    let seed = args.flag_inputfile.as_ref()
-                   .and_then(|fif| util::read_file_to_string(fif).ok()
-                                   .and_then(|d| Some(parser::parse_plaintext(d))));
+    let seed = args.flag_inputfile
+        .as_ref()
+        .and_then(|fif| util::read_file_to_string(fif).ok().and_then(|d| Some(parser::parse_plaintext(d))));
 
     let mut world = World::new(args.flag_width, args.flag_height).seed(seed);
 
