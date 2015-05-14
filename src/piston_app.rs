@@ -58,7 +58,8 @@ pub fn start_piston_app(world: World, period: u64, cell_size: u32, gl_version: u
         opengl,
         WindowSettings::new(
             "G-O-L-R",
-            [width as u32 * cell_size + 2 * OFFSET, height as u32 * cell_size + 2 * OFFSET]
+            [width as u32 * cell_size + 4 * OFFSET, 
+             height as u32 * cell_size + 4 * OFFSET]
         )
         .exit_on_esc(true)
     );
