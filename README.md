@@ -1,4 +1,4 @@
-# Golr
+# Golr [![Build Status](https://travis-ci.org/pillserg/golr.svg)](https://travis-ci.org/pillserg/golr.svg)
 Conway's Game of Life in Rust
 
 # Getting started
