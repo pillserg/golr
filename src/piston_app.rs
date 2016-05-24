@@ -1,5 +1,6 @@
 use piston::window::WindowSettings;
-use piston::event::*;
+use piston::event_loop::*;
+use piston::input::*;
 use glutin_window::GlutinWindow as Window;
 use opengl_graphics::{ GlGraphics, OpenGL };
 
@@ -50,19 +51,20 @@ impl App {
 
 pub fn start_piston_app(world: World, period: u64, cell_size: u32, gl_version: u32) {
     let opengl = match gl_version {
-        30 => OpenGL::_3_0,
-        _ => OpenGL::_3_2
+        30 => OpenGL::V3_0,
+        _ => OpenGL::V3_2
     };
     let (width, height) = world.size();
-    let window = Window::new(
-        opengl,
-        WindowSettings::new(
+
+    let mut window: Window = WindowSettings::new(
             "G-O-L-R",
             [width as u32 * cell_size + 4 * OFFSET, 
              height as u32 * cell_size + 4 * OFFSET]
         )
         .exit_on_esc(true)
-    );
+        .opengl(opengl)
+        .build()
+        .unwrap();
 
     let mut app = App {
         gl: GlGraphics::new(opengl),
@@ -72,7 +74,9 @@ pub fn start_piston_app(world: World, period: u64, cell_size: u32, gl_version: u
 
     let ups = 1000/period;
 
-    for e in window.events().max_fps(MAX_FPS).ups(ups) {
+    let mut events = window.events().max_fps(MAX_FPS).ups(ups);
+
+    while let Some(e) = events.next(&mut window) {
         if let Some(r) = e.render_args() {
             app.render(&r);
         }
