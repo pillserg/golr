@@ -32,8 +32,8 @@ cargo run -- -w 100 -h 30 -p 66 -r 1 --cell-size 10 -i src/gardens/gosper.txt
 Open an issue. Disscuss. Implement. Send PR.
 
 # Misc
- - [multirust][multirust] is great https://github.com/brson/multirust
+ - [rustup][rustup] is great 
  - [racer][racer] works - and thus is also great
 
-[multirust]: https://github.com/brson/multirust
+[rustup]: https://www.rustup.rs/
 [racer]: https://github.com/phildawes/racer
